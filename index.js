@@ -27,10 +27,11 @@ var client = github.client({
   password: password
 });
 var ghme = client.me();
+var ghorg = client.org(orgName);
 
 getAllWatchedRepos()
   .then(function(repos) {
-    console.log('Currently watching ' + repos.length + ' repos.');
+    console.log(username + ' is currently watching ' + repos.length + ' repos.');
     return repos;
   })
   .then(onlyOrgRepos)
@@ -39,8 +40,7 @@ getAllWatchedRepos()
     console.log('Unwatched ' + unwatchedRepos.length + ' repos.');
   })
   .catch(function(err) {
-    console.log('Error:');
-    console.log(err);
+    console.log(err.stack);
   });
 
 function unwatchAllRepos(repos) {
@@ -48,46 +48,67 @@ function unwatchAllRepos(repos) {
 }
 
 function unwatchRepo(repo) {
-  var owner        = repo.owner.login;
-  var repo         = repo.name;
-  var fullName     = owner + '/' + repo;
+  var fullName     = repo.full_name;
   var clientDelete = RSVP.denodeify(client.del.bind(client));
 
-  console.log('Unwatch: ' + owner + '/' + repo);
+  console.log('Unwatch: ' + fullName);
   return clientDelete('/repos/' + fullName + '/subscription', {}).then(function() {
-    return fullName;
+    return repo;
   });
 }
 
 function onlyOrgRepos(repos) {
-  return repos.filter(function(repo) {
-    return repo.owner.login === orgName;
+  return getAllOrgRepos().then(function(orgRepos) {
+    var orgRepoFullNames = orgRepos.map(function(orgRepo) {
+      return orgRepo.full_name;
+    });
+
+    var orgRepoNames = orgRepos.map(function(orgRepo) {
+      return orgRepo.name;
+    });
+
+    return repos.filter(function(repo) {
+      var isOrgRepo       = orgRepoFullNames.indexOf(repo.full_name) > -1;
+      var isForkedOrgRepo = repo.fork && orgRepoNames.indexOf(repo.name) > -1;
+
+      return isOrgRepo || isForkedOrgRepo;
+    });
   });
 }
 
-function watchedRepos(page, allRepos, cb) {
-  ghme.watched(page, 100, function(err, res, headers) {
-    if (err) { return cb(err); }
-
-    allRepos = allRepos.concat(res);
-
-    var nextPage = hasNextPage(headers);
-
-    if (nextPage) {
-      watchedRepos(nextPage, allRepos, cb);
-    } else {
-      cb(null, allRepos);
-    }
-  });
+function getAllOrgRepos() {
+  console.log('Finding all ' + orgName + '\'s repos. This may take awhile.');
+  return getAll(ghorg.repos.bind(ghorg));
 }
 
 function getAllWatchedRepos() {
-  var watchedReposPromise = RSVP.denodeify(watchedRepos);
-
-  return watchedReposPromise(1, []);
+  console.log('Finding all ' + username + '\'s watched repos. This may take awhile.');
+  return getAll(ghme.watched.bind(ghme));
 }
 
 function hasNextPage(headers) {
   var link = parseLinkHeader(headers.link);
   return link.next && link.next.page;
+}
+
+function getAll(method) {
+  var getAllPromise = RSVP.denodeify(getAllCb.bind(null, method));
+
+  return getAllPromise(1, []);
+}
+
+function getAllCb(method, page, acc, cb) {
+  method(page, 100, function(err, res, headers) {
+    if (err) { return cb(err); }
+
+    acc = acc.concat(res);
+
+    var nextPage = hasNextPage(headers);
+
+    if (nextPage) {
+      getAllCb(method, nextPage, acc, cb);
+    } else {
+      cb(null, acc);
+    }
+  });
 }
