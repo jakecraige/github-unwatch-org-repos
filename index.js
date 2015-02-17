@@ -18,8 +18,7 @@ getAllWatchedRepos()
   .then(onlyOrgRepos)
   .then(unwatchAllRepos)
   .then(function(unwatchedRepos) {
-    console.log('Unwatched ' + unwatchedRepos.length + 'repos:');
-    console.log(unwatchedRepos);
+    console.log('Unwatched ' + unwatchedRepos.length + ' repos.');
   })
   .catch(function(err) {
     console.log('Error:');
@@ -31,12 +30,14 @@ function unwatchAllRepos(repos) {
 }
 
 function unwatchRepo(repo) {
-  var owner  = repo.owner.login;
-  var repo   = repo.name;
+  var owner        = repo.owner.login;
+  var repo         = repo.name;
+  var fullName     = owner + '/' + repo;
   var clientDelete = RSVP.denodeify(client.del.bind(client));
 
-  return clientDelete('/repos/' + owner + '/' + repo + '/subscription', {}).then(function() {
-    return repo.full_name;
+  console.log('Unwatch: ' + owner + '/' + repo);
+  return clientDelete('/repos/' + fullName + '/subscription', {}).then(function() {
+    return fullName;
   });
 }
 
@@ -54,7 +55,7 @@ function watchedRepos(page, allRepos, cb) {
 
     var nextPage = hasNextPage(headers);
 
-    if (nextPage && nextPage < 6) {
+    if (nextPage) {
       watchedRepos(nextPage, allRepos, cb);
     } else {
       cb(null, allRepos);
