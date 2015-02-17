@@ -18,7 +18,7 @@ getAllWatchedRepos()
   .then(onlyOrgRepos)
   .then(unwatchAllRepos)
   .then(function(unwatchedRepos) {
-    console.log('Unwatched ' + unwatchRepos.length + 'repos:');
+    console.log('Unwatched ' + unwatchedRepos.length + 'repos:');
     console.log(unwatchedRepos);
   })
   .catch(function(err) {
