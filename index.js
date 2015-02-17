@@ -1,3 +1,5 @@
+'use strict';
+
 var argv            = require('minimist')(process.argv.slice(2));
 var RSVP            = require('rsvp');
 var mapSeries       = require('promise-map-series');
@@ -8,6 +10,18 @@ var username = argv.u;
 var password = argv.p;
 var orgName  = argv.o;
 
+if (!username) {
+  throw new Error('You must provide a username as the -u argument');
+}
+
+if (!password) {
+  throw new Error('You must provide a password as the -p argument');
+}
+
+if (!orgName) {
+  throw new Error('You must provide a organization name as the -o argument');
+}
+
 var client = github.client({
   username: username,
   password: password
@@ -15,6 +29,10 @@ var client = github.client({
 var ghme = client.me();
 
 getAllWatchedRepos()
+  .then(function(repos) {
+    console.log('Currently watching ' + repos.length + ' repos.');
+    return repos;
+  })
   .then(onlyOrgRepos)
   .then(unwatchAllRepos)
   .then(function(unwatchedRepos) {

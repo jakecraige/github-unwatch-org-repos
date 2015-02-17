@@ -1,12 +1,10 @@
-# github-stop-watching-org-repos
+# github-unwatch-org-repos
 
-Simple utility script for unwatching all of an org's repos
-
+A utility for unwatching all of an organization's repositories
 
 ## Usage
 
 ```sh
-git clone https://github.com/jakecraige/github-stop-watching-org-repos
-cd github-stop-watching-org-repos
-node index.js -u username -p password -o organization
+npm install -g github-unwatch-org-repos
+github-unwatch-org-repos -u username -p password -o organization
 ```

@@ -1,14 +1,17 @@
 {
-  "name": "github-stop-watching-org-repos",
+  "name": "github-unwatch-org-repos",
   "version": "1.0.0",
-  "description": "Utility to stop watching an organization's repositories",
+  "description": "A utility for unwatching all of an an organization's repositories",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "./bin/github-unwatch-org-repos"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jakecraige/github-stop-watching-org-repos.git"
+    "url": "https://github.com/jakecraige/github-unwatch-org-repos.git"
   },
   "keywords": [
     "github",
@@ -17,9 +20,9 @@
   "author": "Jake Craige <james.craige@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jakecraige/github-stop-watching-org-repos/issues"
+    "url": "https://github.com/jakecraige/github-unwatch-org-repos/issues"
   },
-  "homepage": "https://github.com/jakecraige/github-stop-watching-org-repos",
+  "homepage": "https://github.com/jakecraige/github-unwatch-org-repos",
   "dependencies": {
     "minimist": "^1.1.0",
     "octonode": "^0.6.14",
