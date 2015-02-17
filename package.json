@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "./bin/github-unwatch-org-repos"
+    "github-unwatch-org-repos": "./bin/github-unwatch-org-repos"
   },
   "repository": {
     "type": "git",
